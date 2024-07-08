@@ -44,18 +44,23 @@ class ProdukController extends Controller
             $kode = 'GNS' . $tahun_bulan . $urut;
         }
 
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'harga' => 'required|numeric|min:0',
-        ]);
+        try {
+            $request->validate([
+                'nama' => 'required|string|max:255',
+                'harga' => 'required|numeric|min:0',
+            ]);
+    
+            $produk = Produk::create([
+                'kode' => $kode,
+                'nama' => $request->nama,
+                'harga' => $request->harga,
+            ]);
+    
+            return response()->json($produk, 201);
+        } catch(\Exception $e) {
+            return response()->json(['message' => $e->getMessage()]);
 
-        $produk = Produk::create([
-            'kode' => $kode,
-            'nama' => $request->nama,
-            'harga' => $request->harga,
-        ]);
-
-        return response()->json($produk, 201);
+        }
     }
 
     /**
@@ -81,16 +86,20 @@ class ProdukController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $produk = Produk::findOrFail($id);
-
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'harga' => 'required|numeric|min:0',
-        ]);
-
-        $produk->update($request->all());
-
-        return response()->json($produk);
+        try {
+            $produk = Produk::findOrFail($id);
+    
+            $request->validate([
+                'nama' => 'required|string|max:255',
+                'harga' => 'required|numeric|min:0',
+            ]);
+    
+            $produk->update($request->all());
+    
+            return response()->json($produk);
+        } catch(\Exception $e) {
+            return response()->json(['message' => $e->getMessage()]);
+        }
     }
 
     /**
