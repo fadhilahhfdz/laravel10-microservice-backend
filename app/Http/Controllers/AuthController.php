@@ -54,17 +54,27 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
+        } else {
+            if ($user->role == 'admin') {
+                $token = $user->createToken('auth_token')->plainTextToken;
+                return response()->json(['message' => 'Berhasil Login', 'role' => 'admin', 'access_token' => $token, 'token_type' => 'Bearer']);
+            } else {
+                $token = $user->createToken('auth_token')->plainTextToken;
+                return response()->json(['message' => 'Berhasil Login', 'role' => 'kasir', 'access_token' => $token, 'token_type' => 'Bearer']);
+            }
+
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json(['message' => 'Berhasil Login', 'access_token' => $token, 'token_type' => 'Bearer']);
     }
 
     public function logout(Request $request) {
