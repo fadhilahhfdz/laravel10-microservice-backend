@@ -50,7 +50,7 @@ class UserController extends Controller
                 'nama' => 'required|string|max:255',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string',
-                'role' => 'required|in:admin,kasir',
+                'role' => 'required|in:admin,supplier',
             ]);
 
             $user = User::create([

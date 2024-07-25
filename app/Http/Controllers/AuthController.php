@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -29,6 +30,7 @@ class AuthController extends Controller
             'nama' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
+            'role' => 'required|in:admin,supplier',
         ]);
 
         if ($validator->fails()) {
@@ -63,10 +65,10 @@ class AuthController extends Controller
         } else {
             if ($user->role == 'admin') {
                 $token = $user->createToken('auth_token')->plainTextToken;
-                return response()->json(['message' => 'Berhasil Login', 'role' => 'admin', 'access_token' => $token, 'token_type' => 'Bearer']);
+                return response()->json(['message' => 'Berhasil Login', 'role' => 'admin', 'access_token' => $token, 'token_type' => 'Bearer', 'user' => $user]);
             } else {
                 $token = $user->createToken('auth_token')->plainTextToken;
-                return response()->json(['message' => 'Berhasil Login', 'role' => 'kasir', 'access_token' => $token, 'token_type' => 'Bearer']);
+                return response()->json(['message' => 'Berhasil Login', 'role' => 'supplier', 'access_token' => $token, 'token_type' => 'Bearer', 'user' => $user]);
             }
 
         }
